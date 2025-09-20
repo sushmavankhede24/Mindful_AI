@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pkl
+*.joblib
+
+# Virtual environment
+.menv/
+.env
+*.env
+
+# IDE / Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Data (optional - comment/remove if you want to keep dataset in Git)
+data/
+*.csv
+
+# Models (optional - comment/remove if you want to keep models in Git)
+# app/models/*.pkl
+
+# Render / Deployment
+*.sqlite3
