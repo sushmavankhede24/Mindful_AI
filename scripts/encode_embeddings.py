@@ -8,7 +8,7 @@ from sentence_transformers import SentenceTransformer
 df = pd.read_csv("data/meditation_data.csv")
 
 # Load embedding model
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = SentenceTransformer("paraphrase-MiniLM-L3-v2")
 
 # Generate embeddings (as numpy arrays)
 embeddings = model.encode(df["RecordingDescription"].tolist(), convert_to_numpy=True)
