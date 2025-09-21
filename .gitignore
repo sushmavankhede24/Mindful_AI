@@ -3,7 +3,6 @@ __pycache__/
 *.pyc
 *.pyo
 *.pyd
-*.pkl
 *.joblib
 
 # Virtual environment
@@ -27,9 +26,6 @@ Thumbs.db
 # Data (optional - comment/remove if you want to keep dataset in Git)
 data/
 *.csv
-
-# Models (optional - comment/remove if you want to keep models in Git)
-# app/models/*.pkl
 
 # Render / Deployment
 *.sqlite3
