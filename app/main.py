@@ -30,3 +30,8 @@ app.include_router(recommend.router, prefix="", tags=["recommend"])
 @app.get("/")
 def root():
     return {"message": "Meditation Recommender API is running!"}
+
+
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
