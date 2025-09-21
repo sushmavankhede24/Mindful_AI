@@ -1,3 +1,4 @@
+# app/services/recommend_service.py
 import os
 
 import joblib
@@ -6,12 +7,11 @@ from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 MODELS_DIR = os.getenv(
-    "MODELS_DIR", os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "models")
+    "MODELS_DIR", os.path.join(os.path.dirname(__file__), "..", "models")
 )
 RECOMMENDATIONS_PATH = os.path.join(MODELS_DIR, "recommendations.pkl")
 EMBEDDINGS_PATH = os.path.join(MODELS_DIR, "embeddings.pkl")
 
-SIM_THRESHOLD = 0.4
 keyword_map = {
     "Sleep": ["sleep", "insomnia", "restless", "tired"],
     "Stress": ["stress", "anxious", "tense", "overwhelmed"],
@@ -29,24 +29,31 @@ keyword_map = {
     ],
 }
 
+SIM_THRESHOLD = 0.4
+
+# Lazy-loaded variables
 _model = None
 _recommendations = None
 _embeddings = None
 _category_embeddings = None
 
 
-def _lazy_load():
+def _init():
     global _model, _recommendations, _embeddings, _category_embeddings
     if _model is None:
-        _recommendations = joblib.load(RECOMMENDATIONS_PATH)
-        _embeddings = joblib.load(EMBEDDINGS_PATH).astype(np.float32)
-
-        _recommendations["themeName"] = (
-            _recommendations["themeName"].str.strip().str.capitalize()
-        )
         _model = SentenceTransformer("all-MiniLM-L6-v2")
         _model.encode("init", show_progress_bar=False)
 
+    if _recommendations is None:
+        _recommendations = joblib.load(RECOMMENDATIONS_PATH)
+        _recommendations["themeName"] = (
+            _recommendations["themeName"].str.strip().str.capitalize()
+        )
+
+    if _embeddings is None:
+        _embeddings = joblib.load(EMBEDDINGS_PATH)
+
+    if _category_embeddings is None:
         categories = _recommendations["themeName"].unique()
         _category_embeddings = {
             cat: _embeddings[
@@ -57,10 +64,10 @@ def _lazy_load():
 
 
 def get_recommendation(prompt: str) -> dict:
-    _lazy_load()
-
+    _init()
     prompt_lower = prompt.lower()
 
+    # Keyword match
     for cat, keywords in keyword_map.items():
         if any(k in prompt_lower for k in keywords):
             cat_idxs = _recommendations[
@@ -78,6 +85,7 @@ def get_recommendation(prompt: str) -> dict:
                 "recommendation": rec["RecordingDescription"],
             }
 
+    # Embedding fallback
     prompt_emb = _model.encode([prompt], convert_to_numpy=True)
     sims = {
         cat: cosine_similarity([prompt_emb[0]], [emb])[0][0]
@@ -85,12 +93,11 @@ def get_recommendation(prompt: str) -> dict:
     }
     chosen_category = max(sims, key=sims.get)
     cat_idxs = _recommendations[_recommendations["themeName"] == chosen_category].index
-
     if len(cat_idxs) == 0:
         return {
             "category": "unknown",
-            "recommendation": "No match found — but your"
-            "next meditation might be just a word away!",
+            "recommendation": "No match found — but "
+            "your next meditation might be just a word away!",
         }
 
     cat_embs = _embeddings[cat_idxs]
@@ -102,7 +109,7 @@ def get_recommendation(prompt: str) -> dict:
     if max_sim < SIM_THRESHOLD:
         return {
             "category": "unknown",
-            "recommendation": "No match found — but "
+            "recommendation": "No match found — but"
             "your next meditation might be just a word away!",
         }
 
