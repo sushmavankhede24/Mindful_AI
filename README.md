@@ -37,23 +37,23 @@ Make sure you have:
 
 ### Install Dependencies
 
-git clone https://github.com/sushmavankhede24/Mindful_AI.git
-cd Mindful_AI
+- git clone https://github.com/sushmavankhede24/Mindful_AI.git
+- cd Mindful_AI
 
 # create and activate virtual environment
-python -m venv venv
-source venv/bin/activate  # macOS/Linux
-venv\Scripts\activate     # Windows
-
-pip install -r requirements.txt
+- python -m venv venv
+- source venv/bin/activate  # macOS/Linux
+- venv\Scripts\activate     # Windows
+  
+- pip install -r requirements.txt
 
 ## Run the API
-uvicorn app.main:app --reload
+- uvicorn app.main:app --reload
 
-- The API will be served at http://127.0.0.1:8000
+The API will be served at http://127.0.0.1:8000
 
 ## Run Tests
-pytest
+- pytest
 
 ## Configuration
 Adjust application settings and environment variables as needed in your local .env or system environment.
